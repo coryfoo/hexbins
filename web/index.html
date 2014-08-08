@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="application/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <link rel="stylesheet" type="text/css" href="css/colorbrewer.css">
+    <style type="text/css">
+#map {
+	display: inline-block;
+	width: 500px;
+	height: 500px;
+	border: 1px solid #888;
+}
+
+polygon {
+  stroke: #666;
+  stroke-width: .2px;
+  opacity: .8;
+}
+
+svg {
+  position: absolute;
+}
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="application/javascript" src="js/hex-overlay.js"></script>
+    <script>
+var mapOptions = {
+    minZoom: 5,
+    maxZoom: 14,
+    zoom: 10,
+    center: new google.maps.LatLng(39.8, -105.0),
+    overviewMapControl: false,
+    panControl: false,
+    rotateControl: false,
+    scaleControl: false,
+    streetViewControl: false,
+    mapTypeControl: false
+  };
+
+var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+var overlay = new HexBinOverlay('/bins');
+overlay.setMap(map);
+    </script>
+  </body>
+</html>

@@ -4,19 +4,16 @@ from bottle import route, run, static_file, request, response
 import json
 import math
 
-import hexbin
-
-DATA = None
+import places
 
 
 @route('/bins')
 def get_bins_for_google_maps():
-    global DATA
-    if not DATA:
-        DATA = hexbin.gen_data()
-
+    bounds = json.loads(request.params.get('bounds'))
+    signals = json.loads(request.params.get('signals'))
     bin_size = 0.1 * math.pow(2, 9 - int(request.params.get('zoom')))
-    bins = hexbin.gen_bins(DATA, bin_size)
+
+    bins = places.get_binned_places(bounds, bin_size, signals=signals, field='location')
     response.content_type = 'application/json'
     return json.dumps({"binSize": bin_size, "bins": bins})
 

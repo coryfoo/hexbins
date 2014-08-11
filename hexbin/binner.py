@@ -27,7 +27,7 @@ def _distance(x: float, y: float, x1: float, y1: float):
     return math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1))
 
 
-def gen_bins(data: list, bin_width=1):
+def gen_bins(data: list, bin_width=1, bins=None):
     """
     From the given array of data points ([[x, y], ...]), generate an array of
     hexagonal bins of given bin_width
@@ -35,7 +35,8 @@ def gen_bins(data: list, bin_width=1):
     :param data: data point array
     :param bin_width: the size of the bins to create
     """
-    bins = {}
+    if not bins:
+        bins = {}
 
     for p in data:
         x, y = p[0], p[1]

@@ -12,7 +12,24 @@ HexBinOverlay.prototype.onRemove = function() {
 
 HexBinOverlay.prototype.draw = function() {
   var overlay = this;
-  d3.json(this.url+'?zoom='+this.getMap().getZoom(), function(error, data) {
+
+  var params = {
+    zoom:this.getMap().getZoom(),
+    bounds:JSON.parse(this.getMap().getBounds()
+        .toString()
+        .replace(/"/g, '')
+        .replace(/\(/g, '[')
+        .replace(/\)/g, ']'))
+  };
+
+  var args = [];
+  for (k in params) {
+    args.push(k+'='+JSON.stringify(params[k]));
+  }
+
+  args.push('signals=[]');
+
+  d3.json(this.url+'?'+args.join('&'), function(error, data) {
     var panes = overlay.getPanes();
     var projection = overlay.getProjection();
     overlay.setBins(data.bins);

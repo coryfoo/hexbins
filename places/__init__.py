@@ -1,5 +1,6 @@
 import json
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import scan
 
 from hexbin import gen_bins
 
@@ -20,7 +21,7 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None, field: 
                 },
                 "filter": {
                     "geo_bounding_box": {
-                        "place.location": {
+                        "location": {
                             "top_left": top_left_point,
                             "bottom_right": bottom_right_point,
                         }
@@ -33,22 +34,21 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None, field: 
     print(query)
     es = Elasticsearch()
 
-    start = 0
-    total = None
     bins = {}
-    while True:
-        result = es.search(index='radius', body=query, params={'size': 5000, 'from': start}, doc_type='place')
-        if not total:
-            print('Total: ', result['hits']['total'])
-            total = result['hits']['total']
+    results = scan(es, query=query, doc_type='place', _source_include=["location.*"], index='radius')
 
-        points = []
-        for hit in result['hits']['hits']:
-            location = hit['_source']['location']
-            points.append([location['lon'], location['lat']])
+    for hit in results:
+        location = hit['_source']['location']
+        bins = gen_bins([[location['lon'], location['lat']]], bin_size, bins=bins)
 
-        bins = gen_bins(points, bin_size, bins=bins)
+    return bins
 
-        start += 5000
-        if start > total:
-            return bins
+
+if __name__ == "__main__":
+    import math
+
+    bounds = [[37.71513372244835, -122.50283068847659], [37.85080401842779, -122.33116931152347]]
+    bin_size = 0.1 * math.pow(2, -3)
+
+    get_binned_places(bounds, bin_size, signals=[], field='location')
+

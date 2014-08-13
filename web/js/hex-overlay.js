@@ -88,8 +88,8 @@ function calculateProjectionCoordinates(binSize, projection, point) {
 
     var xDiffPixel = projection.fromLatLngToDivPixel(new google.maps.LatLng(point.lat(), point.lng() - binSize)).x;
     var yDiffPixel = projection.fromLatLngToDivPixel(new google.maps.LatLng(point.lat() - binSize, point.lng())).y;
-    var xDiff = Math.floor(Math.abs(centerPixel.x - xDiffPixel) / 2);
-    var yDiff = Math.floor(Math.abs(centerPixel.y - yDiffPixel) / 2);
+    var xDiff = Math.abs(centerPixel.x - xDiffPixel) / 2;
+    var yDiff = Math.abs(centerPixel.y - yDiffPixel) / 2;
 
     return {
         x: xDiff,

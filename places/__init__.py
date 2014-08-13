@@ -1,8 +1,5 @@
 import json
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import scan
-
-from hexbin import gen_bins
 
 
 def get_binned_places(bounds: list, bin_size: float, signals: list=None, field: str=None) -> list:
@@ -28,6 +25,19 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None, field: 
                     }
                 }
             }
+        },
+        "size": 0,
+        "aggs": {
+            "hexbins": {
+                "terms": {
+                    "size": 0,
+                    "script_id": "hexbins",
+                    "lang": "groovy",
+                    "params": {
+                        "bin_width": bin_size
+                    }
+                }
+            }
         }
     })
 
@@ -35,11 +45,10 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None, field: 
     es = Elasticsearch()
 
     bins = {}
-    results = scan(es, query=query, doc_type='place', _source_include=["location.*"], index='radius')
+    results = es.search(index='radius', body=query, doc_type='place')
 
-    for hit in results:
-        location = hit['_source']['location']
-        bins = gen_bins([[location['lon'], location['lat']]], bin_size, bins=bins)
+    for bucket in results['aggregations']['hexbins']['buckets']:
+        bins[bucket['key']] = bucket['doc_count']
 
     return bins
 

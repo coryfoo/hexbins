@@ -11,7 +11,7 @@ import places
 def get_bins_for_google_maps():
     bounds = json.loads(request.params.get('bounds'))
     signals = json.loads(request.params.get('signals'))
-    bin_size = 0.1 * math.pow(2, 9 - int(request.params.get('zoom')))
+    bin_size = 0.075 * math.pow(2, 9 - int(request.params.get('zoom')))
 
     bins = places.get_binned_places(bounds, bin_size, signals=signals, field='location')
     response.content_type = 'application/json'

@@ -14,7 +14,7 @@ def _nearest_bins_centerpoint(value: float, scale: float):
     :param scale: The scale of the hexagons
     :returns: tuple of closest bin centerpoints
     """
-    div, mod = divmod(value, scale / 2)
+    div = math.floor(value/(scale / 2))
     rounded = scale / 2 * (div + (1 if div % 2 == 1 else 0))
     rounded_scaled = scale / 2 * (div + (1 if div % 2 == 0 else 0))
     return [rounded, rounded_scaled]

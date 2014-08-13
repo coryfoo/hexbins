@@ -1,0 +1,34 @@
+{
+    "size": 0,
+    "aggs": {
+        "hexbins": {
+            "terms": {
+                "params": {
+                    "bin_width": 0.00078125
+                },
+                "size": 0,
+                "lang": "groovy",
+                "script_id": "hexbins"
+            }
+        }
+    },
+    "query": {
+        "filtered": {
+            "filter": {
+                "geo_bounding_box": {
+                    "location": {
+                        "top_left": [-122.399705116272, 37.80975612328463],
+                        "bottom_right": [-122.38897628021243, 37.801279313014554]
+                    }
+                }
+            },
+            "query": {
+                "bool": {
+                    "must": {
+                        "match_all": {}
+                    }
+                }
+            }
+        }
+    }
+}

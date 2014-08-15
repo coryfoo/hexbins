@@ -6,12 +6,13 @@ HexBinOverlay.prototype = new google.maps.OverlayView();
 
 HexBinOverlay.prototype.onAdd = function () {
   google.maps.event.addListener(map, 'dragend', this.draw.bind(this));
+  google.maps.event.addListener(map, 'zoom_changed', clearBins.bind(null, this));
 
   NProgress.configure({ parent: '#map' });
 };
 
 HexBinOverlay.prototype.onRemove = function () {
-  this.svg && this.svg.remove();
+  clearBins(this);
 };
 
 HexBinOverlay.prototype.draw = function () {
@@ -23,11 +24,12 @@ HexBinOverlay.prototype.draw = function () {
   this.drawDelay = setTimeout(loadDataForBounds.bind(null, this), 600);
 };
 
-function loadDataForBounds(overlay) {
-  if (overlay.svg) {
-    overlay.svg.remove();
-  }
+function clearBins(overlay) {
+  overlay.svg && overlay.svg.remove();
+}
 
+function loadDataForBounds(overlay) {
+  clearBins(overlay);
   var params = {
     zoom: overlay.getMap().getZoom(),
     bounds: JSON.parse(overlay.getMap().getBounds()

@@ -4,7 +4,9 @@ var HexBinOverlay = function(url) {
 
 HexBinOverlay.prototype = new google.maps.OverlayView();
 
-HexBinOverlay.prototype.onAdd = function() { };
+HexBinOverlay.prototype.onAdd = function() {
+    google.maps.event.addListener(map, 'dragend', this.draw.bind(this));
+};
 
 HexBinOverlay.prototype.onRemove = function() {
   this.svg && this.svg.remove();
@@ -81,7 +83,7 @@ function handleHexbinData(overlay, error, data) {
         .attr("class", function(d) { return "q" + quantile(data.bins[d]) + "-9"; })
         .transition()
             .duration(1000)
-            .style('opacity',.8);
+            .style('opacity',.7);
 }
 
 function calculateQuantile(bins) {

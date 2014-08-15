@@ -11,11 +11,18 @@ HexBinOverlay.prototype.onRemove = function() {
 };
 
 HexBinOverlay.prototype.draw = function() {
-  var overlay = this;
+    if ( this.drawDelay ) {
+        console.debug('cancelling timer');
+        clearTimeout(this.drawDelay);
+    }
 
+    this.drawDelay = setTimeout(loadDataForBounds.bind(null, this), 600);
+};
+
+function loadDataForBounds(overlay) {
   var params = {
-    zoom:this.getMap().getZoom(),
-    bounds:JSON.parse(this.getMap().getBounds()
+    zoom:overlay.getMap().getZoom(),
+    bounds:JSON.parse(overlay.getMap().getBounds()
         .toString()
         .replace(/"/g, '')
         .replace(/\(/g, '[')
@@ -29,13 +36,21 @@ HexBinOverlay.prototype.draw = function() {
 
   args.push('signals=[]');
 
-  d3.json(this.url+'?'+args.join('&'), function(error, data) {
+  d3.json(overlay.url+'?'+args.join('&'), handleHexbinData.bind(null, overlay));
+}
+
+function handleHexbinData(overlay, error, data) {
+    if ( error ) {
+        console.error("Failed to load data", error);
+        return;
+    }
+
     var panes = overlay.getPanes();
     var projection = overlay.getProjection();
-    overlay.setBins(data.bins);
+    var quantile = calculateQuantile(data.bins);
 
     if ( overlay.svg ) {
-      overlay.svg.remove();
+        overlay.svg.remove();
     }
 
     var samplePoint = getPoint(Object.keys(data.bins)[0]);
@@ -43,30 +58,33 @@ HexBinOverlay.prototype.draw = function() {
     var hexLineString = pointLineStringWithPointTranslation(projectionCoordinates);
 
     overlay.svg = d3.select(panes.overlayImage).selectAll('svg')
-      .data(Object.keys(data.bins));
+        .data(Object.keys(data.bins));
 
     overlay.svg
         .enter()
-          .append('svg')
-          .style('width', projectionCoordinates.x * 2 + 'px')
-          .style('height', projectionCoordinates.y * projectionCoordinates.ratio * 2 + 'px')
-          .style("left", function(d) {
-             return projection.fromLatLngToDivPixel(getPoint(d)).x-projectionCoordinates.x + 'px';
-          })
-          .style("top", function(d) {
-             return projection.fromLatLngToDivPixel(getPoint(d)).y-projectionCoordinates.y + 'px';
-          })
-          .attr("class", "Blues");
+        .append('svg')
+        .style('width', projectionCoordinates.x * 2 + 'px')
+        .style('height', projectionCoordinates.y * projectionCoordinates.ratio * 2 + 'px')
+        .style("left", function(d) {
+            return projection.fromLatLngToDivPixel(getPoint(d)).x-projectionCoordinates.x + 'px';
+        })
+        .style("top", function(d) {
+            return projection.fromLatLngToDivPixel(getPoint(d)).y-projectionCoordinates.y + 'px';
+        })
+        .attr("class", "Blues");
 
     overlay.svg
         .append("polygon")
+        .style('opacity', 0)
         .attr("transform", "translate("+projectionCoordinates.x+")")
         .attr("points", hexLineString)
-        .attr("class", function(d) { return "q" + overlay.quantize(data.bins[d]) + "-9"; });
-  });
-};
+        .attr("class", function(d) { return "q" + quantile(data.bins[d]) + "-9"; })
+        .transition()
+            .duration(1000)
+            .style('opacity',.8);
+}
 
-HexBinOverlay.prototype.setBins = function(bins) {
+function calculateQuantile(bins) {
     var min = Infinity,
         max = -Infinity;
 
@@ -78,10 +96,10 @@ HexBinOverlay.prototype.setBins = function(bins) {
         if ( max < value ) max = value;
       });
 
-    this.quantize = d3.scale.quantile()
+    return d3.scale.quantile()
         .domain([min, max])
         .range(d3.range(9));
-};
+}
 
 function calculateProjectionCoordinates(binSize, projection, point) {
     var centerPixel = projection.fromLatLngToDivPixel(point);

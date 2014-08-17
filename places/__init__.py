@@ -4,8 +4,11 @@ from elasticsearch import Elasticsearch
 
 
 def verify_setup() -> bool:
-    resp = requests.get('http://localhost:9200/_scripts/groovy/hexbins')
-    return True if resp.status_code == 200 else False
+    try:
+        resp = requests.get('http://localhost:9200/_scripts/groovy/hexbins')
+        return True if resp.status_code == 200 else False
+    except:
+        return False
 
 
 def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list:

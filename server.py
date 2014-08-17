@@ -18,6 +18,12 @@ def get_bins_for_google_maps():
     return json.dumps({"binSize": bin_size, "bins": bins})
 
 
+@route('/verify')
+def verify():
+    response.content_type = 'application/json'
+    return json.dumps({"valid": places.verify_setup()})
+
+
 @route('/')
 @route('/<filepath:path>')
 def index(filepath=None):

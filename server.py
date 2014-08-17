@@ -13,7 +13,18 @@ def get_bins_for_google_maps():
     signals = json.loads(request.params.get('signals'))
     bin_size = 0.075 * math.pow(2, 9 - int(request.params.get('zoom')))
 
-    bins = places.get_binned_places(bounds, bin_size, signals=signals, field='location')
+    bins = places.get_binned_places(bounds, bin_size, signals=signals)
+    response.content_type = 'application/json'
+    return json.dumps({"binSize": bin_size, "bins": bins})
+
+
+@route('/account-bins')
+def get_bins_for_google_maps():
+    bounds = json.loads(request.params.get('bounds'))
+    account = json.loads(request.params.get('account'))
+    bin_size = 0.075 * math.pow(2, 9 - int(request.params.get('zoom')))
+
+    bins = places.get_binned_matches(bounds, account, bin_size)
     response.content_type = 'application/json'
     return json.dumps({"binSize": bin_size, "bins": bins})
 

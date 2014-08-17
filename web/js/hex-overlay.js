@@ -85,7 +85,7 @@ function handleHexbinData(overlay, error, data) {
         .style("top", function (d) {
           return projection.fromLatLngToDivPixel(getPoint(d)).y - projectionCoordinates.y + 'px';
         })
-        .style('transform', 'rotateY(90deg)')
+        .style('transform', 'rotateY(-90deg)')
         .attr("class", "Blues")
           .transition()
           .duration(500)
@@ -94,7 +94,7 @@ function handleHexbinData(overlay, error, data) {
           })
           .styleTween("transform", function() {
             return function(t) {
-              return "rotateY(" + d3.interpolate(90, 0)(t) + "deg)";
+              return "rotateY(" + d3.interpolate(-90, 0)(t) + "deg)";
             };
           });
 

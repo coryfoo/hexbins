@@ -70,6 +70,10 @@ function handleHexbinData(overlay, error, data) {
   overlay.svg = d3.select(panes.overlayImage).selectAll('svg')
       .data(Object.keys(data.bins));
 
+  var delayer = d3.scale.linear()
+      .range([0, 700])
+      .domain([map.getBounds().getSouthWest().lng(), map.getBounds().getNorthEast().lng()]);
+
   overlay.svg
       .enter()
         .append('svg')
@@ -81,7 +85,18 @@ function handleHexbinData(overlay, error, data) {
         .style("top", function (d) {
           return projection.fromLatLngToDivPixel(getPoint(d)).y - projectionCoordinates.y + 'px';
         })
-        .attr("class", "Blues");
+        .style('transform', 'rotateY(90deg)')
+        .attr("class", "Blues")
+          .transition()
+          .duration(500)
+          .delay(function(d) {
+            return delayer(JSON.parse(d)[0]);
+          })
+          .styleTween("transform", function() {
+            return function(t) {
+              return "rotateY(" + d3.interpolate(90, 0)(t) + "deg)";
+            };
+          });
 
   overlay.svg
       .append("polygon")

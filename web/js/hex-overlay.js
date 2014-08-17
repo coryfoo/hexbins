@@ -51,6 +51,7 @@ function loadDataForBounds(overlay) {
 }
 
 function handleHexbinData(overlay, error, data) {
+  clearBins(overlay);
   NProgress.done();
 
   if (error) {

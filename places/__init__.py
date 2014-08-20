@@ -12,8 +12,6 @@ def verify_setup() -> bool:
 
 
 def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list:
-    print(bounds, signals)
-
     top_left_point = [bounds[0][1], bounds[1][0]]
     bottom_right_point = [bounds[1][1], bounds[0][0]]
 
@@ -131,6 +129,87 @@ def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
                     "size": 0,
                     "lang": "groovy",
                     "script_id": "hexbins"
+                },
+                "aggs": {
+                    "won_count": {
+                        "filter": {
+                            "terms": {
+                                "place_id": {
+                                    "index": "production-matches",
+                                    "type": "matches",
+                                    "id": account,
+                                    "cache": False,
+                                    "path": "WON"
+                                }
+                            }
+                        }
+                    },
+                    "lost_count": {
+                        "filter": {
+                            "terms": {
+                                "place_id": {
+                                    "index": "production-matches",
+                                    "type": "matches",
+                                    "id": account,
+                                    "cache": False,
+                                    "path": "LOST"
+                                }
+                            }
+                        }
+                    },
+                    "open_count": {
+                        "filter": {
+                            "terms": {
+                                "place_id": {
+                                    "index": "production-matches",
+                                    "type": "matches",
+                                    "id": account,
+                                    "cache": False,
+                                    "path": "OPEN"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "twitter_count": {
+                "value_count": {
+                    "field": "twitter_account"
+                }
+            },
+            "facebook_count": {
+                "value_count": {
+                    "field": "facebook"
+                }
+            },
+            "google_count": {
+                "value_count": {
+                    "field": "google"
+                }
+            },
+            "yelp_count": {
+                "value_count": {
+                    "field": "yelp"
+                }
+            },
+            "opentable_count": {
+                "value_count": {
+                    "field": "opentable"
+                }
+            },
+            "tripadvisor_count": {
+                "value_count": {
+                    "field": "tripadvisor"
+                }
+            },
+            "revenue": {
+                "terms": {
+                    "field": "revenue"
+                }
+            },
+            "headcount": {
+                "terms": {
+                    "field": "headcount"
                 }
             }
         },
@@ -196,11 +275,31 @@ def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
 
     es = Elasticsearch()
 
-    bins = {}
+    bins = {
+        "binSize": bin_size,
+        "bins": {}
+    }
     results = es.search(index='radius', body=query, doc_type='place')
 
     for bucket in results['aggregations']['hexbins']['buckets']:
-        bins[bucket['key']] = bucket['doc_count']
+        bins['bins'][bucket['key']] = {
+            "count": bucket['doc_count'],
+            "won": bucket['won_count']['doc_count'],
+            "lost": bucket['lost_count']['doc_count'],
+            "open": bucket['open_count']['doc_count']
+        }
+
+
+    bins['stats'] = {
+        "total": results['hits']['total']
+    }
+
+    for agg in results['aggregations'].keys():
+        if agg != 'hexbins':
+            if '_count' in agg:
+                bins['stats'][agg] = results['aggregations'][agg]['value']
+            else:
+                bins['stats'][agg] = results['aggregations'][agg]['buckets']
 
     return bins
 

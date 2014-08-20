@@ -6,77 +6,13 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/colorbrewer.css">
     <link rel="stylesheet" type="text/css" href="css/nprogress.css">
-    <style type="text/css">
-body {
-    box-sizing: border-box;
-    font-family: "Helvetica Neue", helvetica;
-}
-#container {
-    width: 900px;
-    margin: 20px auto;
-}
-
-#map {
-	display: inline-block;
-	width: 900px;
-	height: 700px;
-	border: 1px solid #888;
-}
-
-.blur {
-    -webkit-filter: blur(2px);
-}
-
-#loading {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#loading > div {
-    display: flex;
-    width: 350px;
-    height: 80px;
-    background: white;
-    border-radius: 8px;
-    margin: 260px auto 0;
-    padding: 20px 20px 20px 28px;
-    font-size: 18px;
-    align-items: center;
-    box-shadow: 0 0 10px #888;
-}
-
-#loading i {
-    font-size: 64px;
-    margin-right: 12px;
-}
-
-.green {
-    color: green;
-}
-
-.grey {
-    color: #bcbcbc;
-}
-
-.red {
-    color: red;
-}
-
-polygon {
-  stroke: #666;
-  stroke-width: .2px;
-}
-
-svg {
-  position: absolute;
-}
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
   </head>
   <body>
     <div id="container" class="blur">
+        <div id="geos">
+            <i class="fa fa-globe"></i>
+        </div>
         <div id="map"></div>
         <div id="signals">
             <div></div>
@@ -91,54 +27,6 @@ svg {
 
 <script type="application/javascript" src="js/nprogress.js"></script>
 <script type="application/javascript" src="js/hex-overlay.js"></script>
-<script>
-var mapOptions = {
-    minZoom: 8,
-    maxZoom: 16,
-    zoom: 12,
-    center: new google.maps.LatLng(37.757, -122.436),
-    overviewMapControl: false,
-    panControl: false,
-    rotateControl: false,
-    scaleControl: false,
-    streetViewControl: false,
-    mapTypeControl: false
-  };
-
-var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-function verifySetup() {
-    d3.json('/verify', function(err, response) {
-        var icon = document.querySelector('#loading i');
-        var text = document.querySelector('#loading span');
-        icon.classList.remove('fa-cloud');
-        icon.classList.remove('grey');
-        if ( response.valid ) {
-            icon.classList.add('fa-check');
-            icon.classList.add('green');
-            text.innerText = 'Success!';
-
-            setTimeout(function() {
-                document.querySelector('#loading').remove();
-                document.querySelector('#container').classList.remove('blur');
-
-                loadHexbinsOverlay();
-            }, 1000);
-
-        } else {
-            icon.classList.add('fa-minus-circle');
-            icon.classList.add('red');
-            text.innerText = 'Elasticsearch not setup properly.';
-        }
-    });
-}
-
-function loadHexbinsOverlay() {
-    var overlay = new HexBinOverlay('/bins');
-    overlay.setMap(map);
-}
-
-setTimeout(verifySetup, 400);
-</script>
+<script type="application/javascript" src="js/main.js"></script>
   </body>
 </html>

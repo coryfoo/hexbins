@@ -8,43 +8,35 @@
     <link rel="stylesheet" type="text/css" href="css/nprogress.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css">
   </head>
-  <body>
+  <body data-ng-app>
     <div id="container" class="blur">
         <div id="geos">
             <i class="fa fa-globe"></i>
         </div>
         <div id="map"></div>
-        <div id="stats">
-            <h1>Viewport Statistics</h1>
+        <div id="stats" data-ng-controller="StatsCtrl">
+            <div data-ng-show="data.total">
+                <h1>Viewport Statistics</h1>
 
-            <div class="stat"><span>Places</span>525,400</div>
+                <div class="stat"><span>Places</span>{{data.total | number:0}}</div>
 
-            <h2>Social Media</h2>
-            <div class="stat"><span>Twitter</span>23,456</div>
-            <div class="stat"><span>Facebook</span>12,324</div>
-            <div class="stat"><span>Google</span>1,000</div>
-            <div class="stat"><span>Yelp</span>42,000</div>
-            <div class="stat"><span>OpenTable</span>523</div>
-            <div class="stat"><span>Trip Advisor</span>42</div>
+                <h2>Social Media</h2>
+                <div class="stat"><span>Twitter</span>{{data.twitter_count | number:0}}</div>
+                <div class="stat"><span>Facebook</span>{{data.facebook_count | number:0}}</div>
+                <div class="stat"><span>Google</span>{{data.google_count | number:0}}</div>
+                <div class="stat"><span>Yelp</span>{{data.yelp_count | number:0}}</div>
+                <div class="stat"><span>OpenTable</span>{{data.opentable_count | number:0}}</div>
+                <div class="stat"><span>Trip Advisor</span>{{data.tripadvisor_count | number:0}}</div>
 
-            <h2>Revenue</h2>
-            <div class="stat"><span>Less Than $500,000</span>23,456</div>
-            <div class="stat"><span>$500,000 to $1 Million</span>12,324</div>
-            <div class="stat"><span>$1 to 2.5 Million</span>1,000</div>
-            <div class="stat"><span>$2.5 to 5 Million</span>42,000</div>
-            <div class="stat"><span>$5 to 10 Million</span>523</div>
-            <div class="stat"><span>$10 to 20 Million</span>42</div>
+                <h2>Revenue</h2>
+                <div class="stat" data-ng-repeat="rev in data.revenue">
+                    <span>{{rev.key}}</span>{{rev.doc_count | number:0}}</div>
 
-            <h2>Headcount</h2>
-            <div class="stat"><span>1 to 4</span>32</div>
-            <div class="stat"><span>5 to 9</span>32</div>
-            <div class="stat"><span>10 to 19</span>32</div>
-            <div class="stat"><span>20 to 49</span>32</div>
-            <div class="stat"><span>50 to 99</span>32</div>
-            <div class="stat"><span>100 to 249</span>32</div>
-            <div class="stat"><span>250 to 499</span>32</div>
-            <div class="stat"><span>500 to 999</span>32</div>
-            <div class="stat"><span>Over 1,000</span>32</div>
+                <h2>Headcount</h2>
+                <div class="stat" data-ng-repeat="hc in data.headcount">
+                    <span>{{hc.key}}</span>{{hc.doc_count | number:0}}</div>
+            </div>
+
         </div>
     </div>
     <div id="loading">
@@ -53,7 +45,8 @@
             <span>Verifying Elasticsearch Setup</span>
         </div>
     </div>
-
+<script type="application/javascript" src="js/stats-ctrl.js"></script>
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.22/angular.min.js"></script>
 <script type="application/javascript" src="js/nprogress.js"></script>
 <script type="application/javascript" src="js/hex-overlay.js"></script>
 <script type="application/javascript" src="js/main.js"></script>

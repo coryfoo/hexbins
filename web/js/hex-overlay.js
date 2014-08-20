@@ -59,6 +59,8 @@ function handleHexbinData(overlay, error, data) {
     return;
   }
 
+  angular.element(document.getElementById('stats')).scope().$emit('StatsReceived', data.stats);
+
   var panes = overlay.getPanes();
   var projection = overlay.getProjection();
   var quantile = calculateQuantile(data.bins);

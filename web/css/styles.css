@@ -1,24 +1,31 @@
 body {
   box-sizing: border-box;
   font-family: "Helvetica Neue", helvetica;
+  margin: 0;
+  padding: 0;
+  color: #555;
+  font-size: 12px;
 }
 
 #container {
-  width: 900px;
-  margin: 20px auto;
-  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
 }
 
 #map {
   display: inline-block;
-  width: 900px;
-  height: 700px;
+  height: 100%;
+  flex-basis: 900px;
+  flex-grow: 2;
   border: 1px solid #888;
 }
 
 #geos {
-  position: absolute;
-  left: -36px;
+  flex-grow: 1;
+  min-width: 250px;
 }
 
 #geos i {
@@ -36,6 +43,36 @@ i.spin {
   -webkit-animation-duration: 0.5s;
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-timing-function: linear;
+}
+
+#stats {
+  padding: 10px;
+  flex-grow: 1;
+  min-width: 250px;
+}
+
+h1 {
+  color: #8E91E2;
+  font-size: 14px;
+  font-weight: 500;
+  -webkit-margin-before: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+h2 {
+  color: #8E91E2;
+  font-size: 13px;
+  font-weight: 400;
+  border-bottom: 1px solid #eee;
+}
+
+.stat span {
+  display: inline-block;
+  font-size: 11px;
+  width: 110px;
+  color: #aaa;
+  margin-right: 10px;
+  text-align: right;
 }
 
 .blur {

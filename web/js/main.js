@@ -62,4 +62,5 @@ function loadHexbinsOverlay() {
   new HexBinOverlay('/bins').setMap(map);
 }
 
+document.querySelector('#map').style.height = window.innerHeight + 'px';
 setTimeout(verifySetup, 250);

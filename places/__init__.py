@@ -46,6 +46,46 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list
                         "bin_width": bin_size
                     }
                 }
+            },
+            "twitter_count": {
+                "value_count": {
+                    "field": "twitter_account"
+                }
+            },
+            "facebook_count": {
+                "value_count": {
+                    "field": "facebook"
+                }
+            },
+            "google_count": {
+                "value_count": {
+                    "field": "google"
+                }
+            },
+            "yelp_count": {
+                "value_count": {
+                    "field": "yelp"
+                }
+            },
+            "opentable_count": {
+                "value_count": {
+                    "field": "opentable"
+                }
+            },
+            "tripadvisor_count": {
+                "value_count": {
+                    "field": "tripadvisor"
+                }
+            },
+            "revenue": {
+                "terms": {
+                    "field": "revenue"
+                }
+            },
+            "headcount": {
+                "terms": {
+                    "field": "headcount"
+                }
             }
         }
     })
@@ -53,11 +93,25 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list
     print(query)
     es = Elasticsearch()
 
-    bins = {}
+    bins = {
+        "binSize": bin_size,
+        "bins": {}
+    }
     results = es.search(index='radius', body=query, doc_type='place')
 
     for bucket in results['aggregations']['hexbins']['buckets']:
-        bins[bucket['key']] = bucket['doc_count']
+        bins['bins'][bucket['key']] = bucket['doc_count']
+
+    bins['stats'] = {
+        "total": results['hits']['total']
+    }
+
+    for agg in results['aggregations'].keys():
+        if agg != 'hexbins':
+            if '_count' in agg:
+                bins['stats'][agg] = results['aggregations'][agg]['value']
+            else:
+                bins['stats'][agg] = results['aggregations'][agg]['buckets']
 
     return bins
 

@@ -15,7 +15,7 @@ def get_bins_for_google_maps():
 
     bins = places.get_binned_places(bounds, bin_size, signals=signals)
     response.content_type = 'application/json'
-    return json.dumps({"binSize": bin_size, "bins": bins})
+    return json.dumps(bins)
 
 
 @route('/account-bins')

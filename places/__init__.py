@@ -151,6 +151,38 @@ def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
     return bins
 
 
+def top_metros(account: int):
+    bins = []
+    if not account:
+        query = json.dumps({
+            "size": 0,
+            "aggs": {
+                "metros": {
+                    "terms": {
+                        "field": "metro"
+                    },
+                    "aggs": {
+                        "viewport": {
+                            "geo_bounds": {
+                                "field": "location"
+                            }
+                        }
+                    }
+                }
+            },
+            "query": {
+                "match_all": {}
+            }
+        })
+
+        results = Elasticsearch().search(index='radius', body=query, doc_type='place')
+
+        for bucket in results['aggregations']['metros']['buckets']:
+            bins.append({"name": bucket['key'], "count": bucket['doc_count'], "bounds": bucket['viewport']['bounds']})
+
+    return bins
+
+
 if __name__ == "__main__":
     import math
 
@@ -158,4 +190,3 @@ if __name__ == "__main__":
     bin_size = 0.1 * math.pow(2, -3)
 
     get_binned_places(bounds, bin_size, signals=[])
-

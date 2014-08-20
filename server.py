@@ -21,7 +21,7 @@ def get_bins_for_google_maps():
 @route('/account-bins')
 def get_bins_for_google_maps():
     bounds = json.loads(request.params.get('bounds'))
-    account = json.loads(request.params.get('account'))
+    account = request.params.get('account')
     bin_size = 0.075 * math.pow(2, 9 - int(request.params.get('zoom')))
 
     bins = places.get_binned_matches(bounds, account, bin_size)
@@ -33,6 +33,13 @@ def get_bins_for_google_maps():
 def verify():
     response.content_type = 'application/json'
     return json.dumps({"valid": places.verify_setup()})
+
+
+@route('/metros')
+def verify():
+    account = request.params.get('account')
+    response.content_type = 'application/json'
+    return json.dumps(places.top_metros(account))
 
 
 @route('/')

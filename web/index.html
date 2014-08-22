@@ -10,8 +10,12 @@
   </head>
   <body data-ng-app>
     <div id="container" class="blur">
-        <div id="geos">
-            <i class="fa fa-globe"></i>
+        <div id="metros" data-ng-controller="MetrosCtrl">
+            <div data-ng-show="data.metros">
+                <h1>Top Metros</h1>
+                <div class="metro" data-ng-repeat="metro in data.metros"
+                     data-ng-click="navigateToMetro(metro)">{{metro.name}} </div>
+            </div>
         </div>
         <div id="map"></div>
         <div id="stats" data-ng-controller="StatsCtrl">
@@ -46,6 +50,7 @@
         </div>
     </div>
 <script type="application/javascript" src="js/stats-ctrl.js"></script>
+<script type="application/javascript" src="js/metros-ctrl.js"></script>
 <script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.22/angular.min.js"></script>
 <script type="application/javascript" src="js/nprogress.js"></script>
 <script type="application/javascript" src="js/hex-overlay.js"></script>

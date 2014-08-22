@@ -327,11 +327,78 @@ def top_metros(account: int):
                 "match_all": {}
             }
         })
+    else:
+        query = json.dumps({
+            "size": 0,
+            "aggs": {
+                "metros": {
+                    "terms": {
+                        "field": "metro"
+                    },
+                    "aggs": {
+                        "viewport": {
+                            "geo_bounds": {
+                                "field": "location"
+                            }
+                        }
+                    }
+                }
+            },
+            "query": {
+                "filtered": {
+                    "query": {
+                        "match_all": {}
+                    },
+                    "filter": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "terms": {
+                                        "place_id": {
+                                            "index": "production-matches",
+                                            "type": "matches",
+                                            "id": account,
+                                            "cache": False,
+                                            "path": "OPEN"
+                                        }
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "place_id": {
+                                            "index": "production-matches",
+                                            "type": "matches",
+                                            "id": account,
+                                            "cache": False,
+                                            "path": "WON"
+                                        }
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "place_id": {
+                                            "index": "production-matches",
+                                            "type": "matches",
+                                            "id": account,
+                                            "cache": False,
+                                            "path": "LOST"
+                                        }
+                                    }
 
-        results = Elasticsearch().search(index='radius', body=query, doc_type='place')
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        })
 
-        for bucket in results['aggregations']['metros']['buckets']:
-            bins.append({"name": bucket['key'], "count": bucket['doc_count'], "bounds": bucket['viewport']['bounds']})
+    results = Elasticsearch().search(index='radius', body=query, doc_type='place')
+
+    for bucket in results['aggregations']['metros']['buckets']:
+        print(bucket['key'])
+
+        bins.append({"name": bucket['key'], "count": bucket['doc_count'], "bounds": bucket['viewport']['bounds']})
 
     return bins
 

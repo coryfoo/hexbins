@@ -23,26 +23,10 @@ body {
   border: 1px solid #888;
 }
 
-#geos {
+#metros {
+  padding: 10px;
   flex-grow: 1;
   min-width: 250px;
-}
-
-#geos i {
-  color: #ccc;
-  font-size: 32px;
-  transition: color .25s ease-in-out;
-}
-
-#geos i:hover {
-  color: #4A789C;
-}
-
-i.spin {
-  -webkit-animation-name: rotate;
-  -webkit-animation-duration: 0.5s;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear;
 }
 
 #stats {
@@ -64,6 +48,22 @@ h2 {
   font-size: 13px;
   font-weight: 400;
   border-bottom: 1px solid #eee;
+}
+
+.metro {
+  padding: 4px 0;
+  font-size: 13px;
+  color: #aaa;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  transition: all .1s ease-in-out;
+}
+
+.metro:hover {
+  color: #555;
+  border-bottom-color: #8E91E2;
 }
 
 .stat span {

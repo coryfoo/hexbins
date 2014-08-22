@@ -11,7 +11,7 @@ var mapOptions = {
   mapTypeControl: false
 };
 
-var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+window.map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
 var icon = document.querySelector('#loading i');
 var text = document.querySelector('#loading span');
@@ -33,12 +33,8 @@ function verifySetup() {
 }
 
 function loadMetrosForAccount() {
-  var geoIcon = document.querySelector('#geos > i');
-  geoIcon.classList.add('spin');
-  d3.json('/metros', function(err, response) {
-    geoIcon.classList.remove('spin');
-
-    console.log(response);
+  d3.json('/metros', function(err, data) {
+    angular.element(document.getElementById('metros')).scope().$emit('MetrosReceived', data);
     verificationSuccess();
   });
 }

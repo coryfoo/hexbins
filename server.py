@@ -40,6 +40,13 @@ def verify():
     return json.dumps(places.top_metros(account))
 
 
+@route('/status-counts')
+def account_status_counts():
+    account = request.params.get('account')
+    response.content_type = 'application/json'
+    return json.dumps(places.get_total_status_counts(account))
+
+
 @route('/')
 @route('/<filepath:path>')
 def index(filepath=None):

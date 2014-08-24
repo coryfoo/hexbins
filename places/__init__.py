@@ -396,11 +396,107 @@ def top_metros(account: int):
     results = Elasticsearch().search(index='radius', body=query, doc_type='place')
 
     for bucket in results['aggregations']['metros']['buckets']:
-        print(bucket['key'])
-
         bins.append({"name": bucket['key'], "count": bucket['doc_count'], "bounds": bucket['viewport']['bounds']})
 
     return bins
+
+
+def get_total_status_counts(account: int):
+    query = json.dumps({
+        "size": 0,
+        "aggs": {
+            "total_won_count": {
+                "filter": {
+                    "terms": {
+                        "place_id": {
+                            "index": "production-matches",
+                            "type": "matches",
+                            "id": account,
+                            "cache": False,
+                            "path": "WON"
+                        }
+                    }
+                }
+            },
+            "total_lost_count": {
+                "filter": {
+                    "terms": {
+                        "place_id": {
+                            "index": "production-matches",
+                            "type": "matches",
+                            "id": account,
+                            "cache": False,
+                            "path": "LOST"
+                        }
+                    }
+                }
+            },
+            "total_open_count": {
+                "filter": {
+                    "terms": {
+                        "place_id": {
+                            "index": "production-matches",
+                            "type": "matches",
+                            "id": account,
+                            "cache": False,
+                            "path": "OPEN"
+                        }
+                    }
+                }
+            }
+        },
+        "query": {
+            "filtered": {
+                "filter": {
+                    "bool": {
+                        "should": [
+                            {
+                                "terms": {
+                                    "place_id": {
+                                        "index": "production-matches",
+                                        "type": "matches",
+                                        "id": account,
+                                        "cache": False,
+                                        "path": "WON"
+                                    }
+                                }
+                            },
+                            {
+                                "terms": {
+                                    "place_id": {
+                                        "index": "production-matches",
+                                        "type": "matches",
+                                        "id": account,
+                                        "cache": False,
+                                        "path": "LOST"
+                                    }
+                                }
+                            },
+                            {
+                                "terms": {
+                                    "place_id": {
+                                        "index": "production-matches",
+                                        "type": "matches",
+                                        "id": account,
+                                        "cache": False,
+                                        "path": "OPEN"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    })
+
+    counts = {}
+
+    results = Elasticsearch().search(index='radius', body=query, doc_type='place')
+    for agg in results['aggregations'].keys():
+        counts[agg] = results['aggregations'][agg]['doc_count']
+
+    return counts
 
 
 if __name__ == "__main__":

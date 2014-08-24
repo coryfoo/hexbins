@@ -33,7 +33,7 @@ function verifySetup() {
 }
 
 function loadMetrosForAccount() {
-  d3.json('/metros', function(err, data) {
+  d3.json('/metros?account='+getAccountIdFromQueryParam(), function(err, data) {
     angular.element(document.getElementById('metros')).scope().$emit('MetrosReceived', data);
     verificationSuccess();
   });
@@ -55,8 +55,24 @@ function verificationSuccess() {
 }
 
 function loadHexbinsOverlay() {
-  new HexBinOverlay('/bins').setMap(map);
+  var url = '/bins';
+  var accountId = getAccountIdFromQueryParam();
+  if ( accountId ) {
+    url = '/account-bins?account='+accountId;
+  }
+
+  new HexBinOverlay(url, !!(accountId)).setMap(map);
 }
+
+window.getAccountIdFromQueryParam = function() {
+  var idx = location.search.indexOf('account=');
+  if ( idx < 0 ) return null;
+
+  var nextParam = location.search.indexOf('&', idx);
+  if ( nextParam < 0 ) nextParam = location.search.length;
+
+  return +(location.search.substring(idx+'account='.length, nextParam));
+};
 
 document.querySelector('#map').style.height = window.innerHeight + 'px';
 setTimeout(verifySetup, 250);

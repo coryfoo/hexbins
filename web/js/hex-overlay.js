@@ -1,5 +1,7 @@
-var HexBinOverlay = function (url) {
+var HexBinOverlay = function (url, useStatusData) {
   this.url = url;
+  this.useStatusData = useStatusData;
+  this.appendQueryStart = url.indexOf('?') < 0;
 };
 
 HexBinOverlay.prototype = new google.maps.OverlayView();
@@ -47,7 +49,12 @@ function loadDataForBounds(overlay) {
   args.push('signals=[]');
 
   NProgress.start();
-  d3.json(overlay.url + '?' + args.join('&'), handleHexbinData.bind(null, overlay));
+
+  var url = overlay.url +
+      (overlay.appendQueryStart ? '?' : '&') +
+      args.join('&');
+
+  d3.json(url, handleHexbinData.bind(null, overlay));
 }
 
 function handleHexbinData(overlay, error, data) {
@@ -63,7 +70,7 @@ function handleHexbinData(overlay, error, data) {
 
   var panes = overlay.getPanes();
   var projection = overlay.getProjection();
-  var quantile = calculateQuantile(data.bins);
+  var quantile = calculateQuantile(data.bins, overlay.useStatusData);
 
   var samplePoint = getPoint(Object.keys(data.bins)[0]);
   var projectionCoordinates = calculateProjectionCoordinates(data.binSize, projection, samplePoint);
@@ -106,21 +113,25 @@ function handleHexbinData(overlay, error, data) {
       .attr("transform", "translate(" + projectionCoordinates.x + ")")
       .attr("points", hexLineString)
       .attr("class", function (d) {
-        return "q" + quantile(data.bins[d]) + "-9";
+        var quantileScale = overlay.useStatusData?
+            quantile(data.bins[d].count) :
+            quantile(data.bins[d]);
+
+        return "q" + quantileScale + "-9";
       })
       .transition()
       .duration(1000)
       .style('opacity', .7);
 }
 
-function calculateQuantile(bins) {
+function calculateQuantile(bins, useStatusData) {
   var min = Infinity,
       max = -Infinity;
 
   Array.prototype.forEach.call(
       Object.keys(bins),
       function (key) {
-        var value = bins[key];
+        var value = useStatusData ? bins[key].count : bins[key];
         if (min > value) min = value;
         if (max < value) max = value;
       });

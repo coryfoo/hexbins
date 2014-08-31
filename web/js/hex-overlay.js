@@ -1,5 +1,6 @@
 var HexBinOverlay = function (url, useStatusData) {
   this.url = url;
+  this.mode = 'count';
   this.useStatusData = useStatusData;
   this.appendQueryStart = url.indexOf('?') < 0;
 };
@@ -24,6 +25,11 @@ HexBinOverlay.prototype.draw = function () {
   }
 
   this.drawDelay = setTimeout(loadDataForBounds.bind(null, this), 600);
+};
+
+HexBinOverlay.prototype.setMode = function(mode) {
+  this.mode = mode;
+  handleHexbinData(this, this.data);
 };
 
 function clearBins(overlay) {
@@ -54,30 +60,58 @@ function loadDataForBounds(overlay) {
       (overlay.appendQueryStart ? '?' : '&') +
       args.join('&');
 
-  d3.json(url, handleHexbinData.bind(null, overlay));
+  d3.json(url, function(error, data) {
+    NProgress.done();
+    if (error) {
+      console.error("Failed to load data", error);
+      return;
+    }
+
+    angular.element(document.getElementById('stats')).scope().$emit('StatsReceived', data.stats);
+
+    overlay.data = data;
+    handleHexbinData(overlay, data);
+  });
 }
 
-function handleHexbinData(overlay, error, data) {
+function handleHexbinData(overlay, data) {
   clearBins(overlay);
-  NProgress.done();
 
-  if (error) {
-    console.error("Failed to load data", error);
-    return;
+  var hexClass = 'PuBuGn';
+  var winRatio;
+  var keys = Object.keys(data.bins);
+  if ( overlay.mode === 'won' ) {
+    hexClass = 'Greens';
+
+    keys = keys.filter(function(key) {
+      return data.bins[key].won > 0;
+    });
+  } else if ( overlay.mode === 'lost' ) {
+    hexClass = 'Reds';
+
+    keys = keys.filter(function(key) {
+      return data.bins[key].lost > 0;
+    });
+  } else if ( overlay.mode === 'ratio' ) {
+    winRatio = angular.element(document.getElementById('stats')).scope().$root.totalAccountStats.winRatio;
+
+    hexClass = 'RdYlGn';
+
+    keys = keys.filter(function(key) {
+      return data.bins[key].lost > 0 || data.bins[key].won > 0;
+    });
   }
-
-  angular.element(document.getElementById('stats')).scope().$emit('StatsReceived', data.stats);
 
   var panes = overlay.getPanes();
   var projection = overlay.getProjection();
-  var quantile = calculateQuantile(data.bins, overlay.useStatusData);
+  var quantile = calculateQuantile(data.bins, overlay.useStatusData, overlay.mode, winRatio);
 
-  var samplePoint = getPoint(Object.keys(data.bins)[0]);
+  var samplePoint = getPoint(keys[0]);
   var projectionCoordinates = calculateProjectionCoordinates(data.binSize, projection, samplePoint);
   var hexLineString = pointLineStringWithPointTranslation(projectionCoordinates);
 
   overlay.svg = d3.select(panes.overlayImage).selectAll('svg')
-      .data(Object.keys(data.bins));
+      .data(keys);
 
   var delayer = d3.scale.linear()
       .range([0, 700])
@@ -95,7 +129,7 @@ function handleHexbinData(overlay, error, data) {
           return projection.fromLatLngToDivPixel(getPoint(d)).y - projectionCoordinates.y + 'px';
         })
         .style('transform', 'rotateY(-90deg)')
-        .attr("class", "Blues")
+        .attr("class", hexClass)
           .transition()
           .duration(500)
           .delay(function(d) {
@@ -104,7 +138,7 @@ function handleHexbinData(overlay, error, data) {
           .styleTween("transform", function() {
             return function(t) {
               return "rotateY(" + d3.interpolate(-90, 0)(t) + "deg)";
-            };
+            }
           });
 
   overlay.svg
@@ -113,9 +147,20 @@ function handleHexbinData(overlay, error, data) {
       .attr("transform", "translate(" + projectionCoordinates.x + ")")
       .attr("points", hexLineString)
       .attr("class", function (d) {
-        var quantileScale = overlay.useStatusData?
-            quantile(data.bins[d].count) :
-            quantile(data.bins[d]);
+        var bin = data.bins[d];
+
+        var quantileScale;
+        if ( !overlay.useStatusData ) {
+          quantileScale = quantile(bin);
+        } else if ( overlay.mode === 'won' ) {
+          quantileScale = quantile(bin.won);
+        } else if ( overlay.mode === 'lost' ) {
+          quantileScale = quantile(bin.lost);
+        } else if ( overlay.mode === 'ratio' ) {
+          quantileScale = quantile((bin.won / ( bin.won + bin.lost )) - winRatio);
+        } else {
+          quantileScale = quantile(bin.count);
+        }
 
         return "q" + quantileScale + "-9";
       })
@@ -124,14 +169,30 @@ function handleHexbinData(overlay, error, data) {
       .style('opacity', .7);
 }
 
-function calculateQuantile(bins, useStatusData) {
+function calculateQuantile(bins, useStatusData, mode, winRatio) {
   var min = Infinity,
       max = -Infinity;
 
   Array.prototype.forEach.call(
       Object.keys(bins),
       function (key) {
-        var value = useStatusData ? bins[key].count : bins[key];
+        var value = null;
+
+        var bin = bins[key];
+        if ( !useStatusData ) {
+          value = bin;
+        } else if ( mode === 'won' ) {
+          value = bin.won;
+        } else if ( mode === 'lost' ) {
+          value = bin.lost;
+        } else if ( mode === 'ratio') {
+          value = (bin.won / ( bin.won + bin.lost )) - winRatio;
+        } else {
+          value = bin.count;
+        }
+
+        if ( value === 0 ) return;
+
         if (min > value) min = value;
         if (max < value) max = value;
       });

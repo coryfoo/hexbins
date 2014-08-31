@@ -1,4 +1,4 @@
-function StatsCtrl($scope) {
+function StatsCtrl($scope, $rootScope) {
   $scope.data = {};
 
   $scope.$on('StatsReceived', function(evt, data) {
@@ -9,7 +9,11 @@ function StatsCtrl($scope) {
 
   $scope.$on('AccountStatsRecevied', function(evt, data) {
     $scope.$apply(function() {
-      $scope.totalAccountStats = data;
+      $rootScope.totalAccountStats = data;
     });
   });
+
+  $scope.setMode = function(mode) {
+    window.hexbins.setMode(mode);
+  };
 }

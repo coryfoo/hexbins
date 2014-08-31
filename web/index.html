@@ -49,6 +49,12 @@
                     <div class="stat"><span>Open</span>{{data.open_count | number:0}}</div>
                     <div class="stat"><span>Won</span>{{data.won_count | number:0}}</div>
                     <div class="stat"><span>Lost</span>{{data.lost_count | number:0}}</div>
+
+                    <h2>Status Mode</h2>
+                    <button data-ng-click="setMode()">Matched Places</button>
+                    <button data-ng-click="setMode('won')">Won Places</button>
+                    <button data-ng-click="setMode('lost')">Lost Places</button>
+                    <button data-ng-click="setMode('ratio')">Success Ratio</button>
                 </div>
             </div>
 

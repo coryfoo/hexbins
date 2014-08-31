@@ -38,7 +38,18 @@
 
                 <h2>Headcount</h2>
                 <div class="stat" data-ng-repeat="hc in data.headcount">
-                    <span>{{hc.key}}</span>{{hc.doc_count | number:0}}</div>
+                    <span>{{hc.key}}</span>{{hc.doc_count | number:0}}
+                </div>
+
+                <div data-ng-show="totalAccountStats">
+                    <h2>Account Stats</h2>
+                    <div class="stat"><span>Total Open</span>{{totalAccountStats.open | number:0}}</div>
+                    <div class="stat"><span>Total Won</span>{{totalAccountStats.won | number:0}}</div>
+                    <div class="stat"><span>Total Lost</span>{{totalAccountStats.lost | number:0}}</div>
+                    <div class="stat"><span>Open</span>{{data.open_count | number:0}}</div>
+                    <div class="stat"><span>Won</span>{{data.won_count | number:0}}</div>
+                    <div class="stat"><span>Lost</span>{{data.lost_count | number:0}}</div>
+                </div>
             </div>
 
         </div>

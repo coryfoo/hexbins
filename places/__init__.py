@@ -211,6 +211,45 @@ def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
                 "terms": {
                     "field": "headcount"
                 }
+            },
+            "won_count": {
+                "filter": {
+                    "terms": {
+                        "place_id": {
+                            "index": "production-matches",
+                            "type": "matches",
+                            "id": account,
+                            "cache": False,
+                            "path": "WON"
+                        }
+                    }
+                }
+            },
+            "lost_count": {
+                "filter": {
+                    "terms": {
+                        "place_id": {
+                            "index": "production-matches",
+                            "type": "matches",
+                            "id": account,
+                            "cache": False,
+                            "path": "LOST"
+                        }
+                    }
+                }
+            },
+            "open_count": {
+                "filter": {
+                    "terms": {
+                        "place_id": {
+                            "index": "production-matches",
+                            "type": "matches",
+                            "id": account,
+                            "cache": False,
+                            "path": "OPEN"
+                        }
+                    }
+                }
             }
         },
         "query": {
@@ -296,7 +335,9 @@ def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
 
     for agg in results['aggregations'].keys():
         if agg != 'hexbins':
-            if '_count' in agg:
+            if agg in ['open_count', 'won_count', 'lost_count']:
+                bins['stats'][agg] = results['aggregations'][agg]['doc_count']
+            elif '_count' in agg:
                 bins['stats'][agg] = results['aggregations'][agg]['value']
             else:
                 bins['stats'][agg] = results['aggregations'][agg]['buckets']

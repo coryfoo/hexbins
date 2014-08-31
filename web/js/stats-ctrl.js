@@ -6,4 +6,10 @@ function StatsCtrl($scope) {
       angular.extend($scope.data, data);
     });
   });
+
+  $scope.$on('AccountStatsRecevied', function(evt, data) {
+    $scope.$apply(function() {
+      $scope.totalAccountStats = data;
+    });
+  });
 }

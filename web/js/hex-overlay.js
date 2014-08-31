@@ -77,17 +77,26 @@ function loadDataForBounds(overlay) {
 function handleHexbinData(overlay, data) {
   clearBins(overlay);
 
-  var hexClass = 'PuBuGn';
-  var winRatio;
-  var keys = Object.keys(data.bins);
+  var winRatio,
+      opacityScale,
+      binDataFn,
+      hexClass,
+      keys = Object.keys(data.bins);
+
   if ( overlay.mode === 'won' ) {
     hexClass = 'Greens';
+    binDataFn = function(bin) {
+      return bin.won;
+    };
 
     keys = keys.filter(function(key) {
       return data.bins[key].won > 0;
     });
   } else if ( overlay.mode === 'lost' ) {
     hexClass = 'Reds';
+    binDataFn = function(bin) {
+      return bin.lost;
+    };
 
     keys = keys.filter(function(key) {
       return data.bins[key].lost > 0;
@@ -96,15 +105,30 @@ function handleHexbinData(overlay, data) {
     winRatio = angular.element(document.getElementById('stats')).scope().$root.totalAccountStats.winRatio;
 
     hexClass = 'RdYlGn';
+    binDataFn = function(bin) {
+      return (bin.won / ( bin.won + bin.lost )) - winRatio;
+    };
 
     keys = keys.filter(function(key) {
       return data.bins[key].lost > 0 || data.bins[key].won > 0;
     });
+
+    opacityScale = d3.scale.log()
+        .domain(calculateExtent(data.bins, function(bin) { return bin.won + bin.lost; }))
+        .range([0.1, 0.9]);
+
+  } else {
+    hexClass = 'PuBuGn';
+    binDataFn = function(bin) {
+      return overlay.useStatusData ? bin.count : bin;
+    }
   }
 
   var panes = overlay.getPanes();
   var projection = overlay.getProjection();
-  var quantile = calculateQuantile(data.bins, overlay.useStatusData, overlay.mode, winRatio);
+  var quantile = d3.scale.quantile()
+      .domain(calculateExtent(data.bins, binDataFn))
+      .range(d3.range(9));
 
   var samplePoint = getPoint(keys[0]);
   var projectionCoordinates = calculateProjectionCoordinates(data.binSize, projection, samplePoint);
@@ -147,49 +171,24 @@ function handleHexbinData(overlay, data) {
       .attr("transform", "translate(" + projectionCoordinates.x + ")")
       .attr("points", hexLineString)
       .attr("class", function (d) {
-        var bin = data.bins[d];
-
-        var quantileScale;
-        if ( !overlay.useStatusData ) {
-          quantileScale = quantile(bin);
-        } else if ( overlay.mode === 'won' ) {
-          quantileScale = quantile(bin.won);
-        } else if ( overlay.mode === 'lost' ) {
-          quantileScale = quantile(bin.lost);
-        } else if ( overlay.mode === 'ratio' ) {
-          quantileScale = quantile((bin.won / ( bin.won + bin.lost )) - winRatio);
-        } else {
-          quantileScale = quantile(bin.count);
-        }
-
+        var quantileScale = quantile(binDataFn(data.bins[d]));
         return "q" + quantileScale + "-9";
       })
       .transition()
-      .duration(1000)
-      .style('opacity', .7);
+        .duration(1000)
+        .style('opacity', function(d) {
+          return  opacityScale ? opacityScale(data.bins[d].won + data.bins[d].lost) : 0.7;
+        });
 }
 
-function calculateQuantile(bins, useStatusData, mode, winRatio) {
+function calculateExtent(bins, binDataFn) {
   var min = Infinity,
       max = -Infinity;
 
   Array.prototype.forEach.call(
       Object.keys(bins),
       function (key) {
-        var value = null;
-
-        var bin = bins[key];
-        if ( !useStatusData ) {
-          value = bin;
-        } else if ( mode === 'won' ) {
-          value = bin.won;
-        } else if ( mode === 'lost' ) {
-          value = bin.lost;
-        } else if ( mode === 'ratio') {
-          value = (bin.won / ( bin.won + bin.lost )) - winRatio;
-        } else {
-          value = bin.count;
-        }
+        var value = binDataFn(bins[key]);
 
         if ( value === 0 ) return;
 
@@ -197,9 +196,7 @@ function calculateQuantile(bins, useStatusData, mode, winRatio) {
         if (max < value) max = value;
       });
 
-  return d3.scale.quantile()
-      .domain([min, max])
-      .range(d3.range(9));
+  return [min, max];
 }
 
 function calculateProjectionCoordinates(binSize, projection, point) {

@@ -48,7 +48,7 @@ function loadDataForBounds(overlay) {
   };
 
   var args = [];
-  for (k in params) {
+  for (var k in params) {
     args.push(k + '=' + JSON.stringify(params[k]));
   }
 
@@ -130,10 +130,6 @@ function handleHexbinData(overlay, data) {
       .domain(calculateExtent(data.bins, binDataFn))
       .range(d3.range(9));
 
-  var samplePoint = getPoint(keys[0]);
-  var projectionCoordinates = calculateProjectionCoordinates(data.binSize, projection, samplePoint);
-  var hexLineString = pointLineStringWithPointTranslation(projectionCoordinates);
-
   overlay.svg = d3.select(panes.overlayImage).selectAll('svg')
       .data(keys);
 
@@ -144,17 +140,23 @@ function handleHexbinData(overlay, data) {
   overlay.svg
       .enter()
         .append('svg')
-        .style('width', projectionCoordinates.x * 2 + 'px')
-        .style('height', projectionCoordinates.y * projectionCoordinates.ratio * 2 + 'px')
-        .style("left", function (d) {
-          return projection.fromLatLngToDivPixel(getPoint(d)).x - projectionCoordinates.x + 'px';
-        })
-        .style("top", function (d) {
-          return projection.fromLatLngToDivPixel(getPoint(d)).y - projectionCoordinates.y + 'px';
-        })
         .style('transform', 'rotateY(-90deg)')
         .attr("class", hexClass)
-          .transition()
+        .each(function(d) {
+          var point = getPoint(d);
+          var coords = calculateProjectionCoordinates(data.binSize, projection, point);
+
+          var width = coords.x * 2;
+          var height = coords.y * coords.ratio * 2;
+          var left = projection.fromLatLngToDivPixel(point).x - coords.x;
+          var top = projection.fromLatLngToDivPixel(point).y - coords.y;
+
+          this.style.width = width + 'px';
+          this.style.height = height + 'px';
+          this.style.left = left + 'px';
+          this.style.top = top + 'px';
+        })
+        .transition()
           .duration(500)
           .delay(function(d) {
             return delayer(JSON.parse(d)[0]);
@@ -168,8 +170,13 @@ function handleHexbinData(overlay, data) {
   overlay.svg
       .append("polygon")
       .style('opacity', 0)
-      .attr("transform", "translate(" + projectionCoordinates.x + ")")
-      .attr("points", hexLineString)
+      .each(function(d) {
+        var point = getPoint(d);
+        var coords = calculateProjectionCoordinates(data.binSize, projection, point);
+
+        this.setAttribute("points", pointLineStringWithPointTranslation(coords));
+        this.setAttribute("transform", "translate(" + coords.x + ")");
+      })
       .attr("class", function (d) {
         var quantileScale = quantile(binDataFn(data.bins[d]));
         return "q" + quantileScale + "-9";
@@ -209,7 +216,7 @@ function calculateProjectionCoordinates(binSize, projection, point) {
 
   return {
     x: xDiff,
-    y: yDiff,
+    y: 17.40,  // this seems to be the best for all latitudes, meh
     ratio: yDiff / xDiff
   }
 }

@@ -171,13 +171,15 @@ h2 {
   border-bottom-color: #8E91E2;
 }
 
-.stat span {
-  display: inline-block;
-  font-size: 11px;
-  width: 110px;
-  color: #aaa;
-  margin-right: 10px;
+.stat {
   text-align: right;
+  clear:both;
+}
+
+.stat span {
+  font-size: 11px;
+  color: #aaa;
+  float: left;
 }
 
 #modes {

@@ -33,6 +33,7 @@
             </div>
             <div id="stats" >
                 <h1><span class="fa">&#xf080;</span> Statistics</h1>
+                <h2>General</h2>
                 <div class="stat"><span>Places</span>{{data.total | number:0}}</div>
 
                 <h2>Social Media</h2>
@@ -44,23 +45,16 @@
                 <div class="stat"><span>Trip Advisor</span>{{data.tripadvisor_count | number:0}}</div>
 
                 <h2>Revenue</h2>
-                <div class="stat" data-ng-repeat="rev in data.revenue">
-                    <span>{{rev.key}}</span>{{rev.doc_count | number:0}}</div>
+                <div class="stat" data-ng-repeat="rev in revenueKeys">
+                    <span>{{rev}}</span>{{data.revenue[rev] | number:0}}
+                </div>
 
                 <h2>Headcount</h2>
-                <div class="stat" data-ng-repeat="hc in data.headcount">
-                    <span>{{hc.key}}</span>{{hc.doc_count | number:0}}
+                <div class="stat" data-ng-repeat="hc in headcountKeys">
+                    <span>{{hc}}</span>{{data.headcount[hc] | number:0}}
                 </div>
 
                 <div data-ng-show="totalAccountStats">
-                    <h2>Account Stats</h2>
-                    <div class="stat"><span>Total Open</span>{{totalAccountStats.open | number:0}}</div>
-                    <div class="stat"><span>Total Won</span>{{totalAccountStats.won | number:0}}</div>
-                    <div class="stat"><span>Total Lost</span>{{totalAccountStats.lost | number:0}}</div>
-                    <div class="stat"><span>Open</span>{{data.open_count | number:0}}</div>
-                    <div class="stat"><span>Won</span>{{data.won_count | number:0}}</div>
-                    <div class="stat"><span>Lost</span>{{data.lost_count | number:0}}</div>
-
                     <h2>Mode</h2>
                     <div id="modes" class="button-group">
                         <div class="button" data-ng-click="setMode()"

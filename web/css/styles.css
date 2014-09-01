@@ -166,6 +166,7 @@ h2 {
 }
 
 .metro:hover span {
+  cursor: pointer;
   color: #555;
   border-bottom-color: #8E91E2;
 }

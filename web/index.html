@@ -10,14 +10,17 @@
   </head>
   <body data-ng-app>
     <div id="container" class="blur">
-        <div id="metros" data-ng-controller="MetrosCtrl">
-            <div data-ng-show="data.metros">
-                <h1>Top Metros</h1>
+        <div id="map"></div>
+        <div id="metros"
+             data-ng-controller="MetrosCtrl"
+             data-ng-class="{ 'expanded':data.expanded, 'collapsed':!data.expanded }"
+             data-ng-show="data.metros">
+            <div class="title fa" data-ng-click="data.expanded = !(!!data.expanded)">&#xf0ac; Metros</div>
+            <div class="content" data-ng-show="data.expanded">
                 <div class="metro" data-ng-repeat="metro in data.metros"
-                     data-ng-click="navigateToMetro(metro)">{{metro.name}} </div>
+                     data-ng-click="navigateToMetro(metro)"><span>{{metro.name}}</span></div>
             </div>
         </div>
-        <div id="map"></div>
         <div id="stats" data-ng-controller="StatsCtrl">
             <div data-ng-show="data.total">
                 <h1>Viewport Statistics</h1>

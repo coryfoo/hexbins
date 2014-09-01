@@ -1,5 +1,7 @@
 function MetrosCtrl($scope) {
-  $scope.data = {};
+  $scope.data = {
+    expanded:true
+  };
 
   var metroMap = {
     'New York-Northern New Jersey-Long Island, NY-NJ-PA': bounds(40.3213,-74.5685,41.1320,-73.3352),
@@ -31,10 +33,6 @@ function MetrosCtrl($scope) {
 
   $scope.$on('MetrosReceived', function(evt, data) {
     $scope.$apply(function() {
-      data.forEach(function(m) {
-        console.log(m.bounds);
-      });
-
       $scope.data.metros = data;
     });
   });

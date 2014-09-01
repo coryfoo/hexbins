@@ -8,31 +8,59 @@ body {
 }
 
 #container {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: stretch;
   height: 100%;
 }
 
 #map {
   display: inline-block;
+  width: 100%;
   height: 100%;
-  flex-basis: 900px;
-  flex-grow: 2;
   border: 1px solid #888;
 }
 
 #metros {
+  position: absolute;
+  top: 9px;
+  left: 37px;
   padding: 10px;
-  flex-grow: 1;
-  min-width: 250px;
+  width: 250px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+#metros.collapsed {
+  background: rgba(255, 255, 255, 0.0);
 }
 
 #stats {
+  position: absolute;
   padding: 10px;
-  flex-grow: 1;
-  min-width: 250px;
+  width: 250px;
+}
+
+.title {
+  cursor: pointer;
+  color: #8E91E2;
+  font-size: 20px;
+  font-weight: 500;
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+}
+
+#metros.collapsed .title {
+  color: #aaa;
+  transition: all .2s linear;
+  border-bottom: 1px solid #aaa;
+}
+
+#metros.collapsed .title:hover {
+  cursor: pointer;
+  color: #8E91E2;
+  border-bottom: 1px solid #666;
+}
+
+.content {
+  padding-top: 3px;
+  border-top: 1px solid #ccc;
 }
 
 h1 {
@@ -52,16 +80,20 @@ h2 {
 
 .metro {
   padding: 4px 0;
-  font-size: 13px;
   color: #aaa;
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.metro span {
+  font-size: 13px;
+  padding-bottom: 1px;
   border-bottom: 1px solid transparent;
   transition: all .1s ease-in-out;
 }
 
-.metro:hover {
+.metro:hover span {
   color: #555;
   border-bottom-color: #8E91E2;
 }
@@ -92,12 +124,11 @@ h2 {
   width: 350px;
   height: 80px;
   background: white;
-  border-radius: 8px;
   margin: 260px auto 0;
   padding: 20px 20px 20px 28px;
   font-size: 18px;
   align-items: center;
-  box-shadow: 0 0 10px #888;
+  box-shadow: 3px 3px 2px #888;
 }
 
 #loading i {

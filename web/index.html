@@ -61,11 +61,17 @@
                     <div class="stat"><span>Won</span>{{data.won_count | number:0}}</div>
                     <div class="stat"><span>Lost</span>{{data.lost_count | number:0}}</div>
 
-                    <h2>Status Mode</h2>
-                    <button data-ng-click="setMode()">Matched Places</button>
-                    <button data-ng-click="setMode('won')">Won Places</button>
-                    <button data-ng-click="setMode('lost')">Lost Places</button>
-                    <button data-ng-click="setMode('ratio')">Success Ratio</button>
+                    <h2>Mode</h2>
+                    <div id="modes" class="button-group">
+                        <div class="button" data-ng-click="setMode()"
+                             data-ng-class="{ 'selected':!data.mode }">Matched</div>
+                        <div class="button" data-ng-click="setMode('won')"
+                             data-ng-class="{ 'selected':data.mode == 'won' }">Won</div>
+                        <div class="button" data-ng-click="setMode('lost')"
+                             data-ng-class="{ 'selected':data.mode == 'lost' }">Lost</div>
+                        <div class="button" data-ng-click="setMode('ratio')"
+                             data-ng-class="{ 'selected':data.mode == 'ratio' }">Success</div>
+                    </div>
                 </div>
             </div>
         </div>

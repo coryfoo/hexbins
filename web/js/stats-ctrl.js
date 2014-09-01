@@ -14,6 +14,9 @@ function StatsCtrl($scope, $rootScope) {
   });
 
   $scope.setMode = function(mode) {
+    if ( $scope.data.mode === mode ) return;
+
+    $scope.data.mode = mode;
     window.hexbins.setMode(mode);
   };
 }

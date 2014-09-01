@@ -3,7 +3,7 @@
   <head>
     <script type="application/javascript" src="http://d3js.org/d3.v3.min.js"></script>
     <script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/colorbrewer.css">
     <link rel="stylesheet" type="text/css" href="css/nprogress.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css">
@@ -15,16 +15,24 @@
              data-ng-controller="MetrosCtrl"
              data-ng-class="{ 'expanded':data.expanded, 'collapsed':!data.expanded }"
              data-ng-show="data.metros">
-            <div class="title fa" data-ng-click="data.expanded = !(!!data.expanded)">&#xf0ac; Metros</div>
+            <div class="title" data-ng-click="data.expanded = !(!!data.expanded)"><span class="fa">&#xf0ac;</span> Metros</div>
             <div class="content" data-ng-show="data.expanded">
                 <div class="metro" data-ng-repeat="metro in data.metros"
                      data-ng-click="navigateToMetro(metro)"><span>{{metro.name}}</span></div>
             </div>
         </div>
-        <div id="stats" data-ng-controller="StatsCtrl">
-            <div data-ng-show="data.total">
-                <h1>Viewport Statistics</h1>
-
+        <div data-ng-controller="StatsCtrl" data-ng-show="data.total">
+            <div id="status">
+                <div class="col" data-ng-repeat="status in ['open', 'won', 'lost']">
+                    <div class="bar">
+                        <span class="value" data-ng-class="status"
+                              data-ng-style="{'height':(data[status+'_count'] / data.total)*100+'%'}"></span>
+                    </div>
+                    <div class="label" data-ng-class="status">{{data[status+'_count'] | number:0}}</div>
+                </div>
+            </div>
+            <div id="stats" >
+                <h1><span class="fa">&#xf080;</span> Statistics</h1>
                 <div class="stat"><span>Places</span>{{data.total | number:0}}</div>
 
                 <h2>Social Media</h2>
@@ -60,7 +68,6 @@
                     <button data-ng-click="setMode('ratio')">Success Ratio</button>
                 </div>
             </div>
-
         </div>
     </div>
     <div id="loading">

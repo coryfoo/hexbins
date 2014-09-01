@@ -33,17 +33,87 @@ body {
 
 #stats {
   position: absolute;
+  right: 9px;
+  top: 9px;
   padding: 10px;
   width: 250px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+#status {
+  position: absolute;
+  top: 9px;
+  right: 285px;
+  width: 180px;
+  height: 65px;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+#status .col {
+  flex-grow: 1;
+  flex-basis: 60px;
+}
+
+#status .col .label {
+  font-size: 12px;
+  font-weight: 300;
+  text-align: center;
+}
+
+#status .col .label.open {
+  color: #F4BA6F;
+}
+#status .col .label.won {
+  color: #7FCB9F;
+}
+#status .col .label.lost {
+  color: #EA6D64;
+}
+
+#status .bar {
+  position: relative;
+  height: 50px;
+  background-color: #eee;
+  margin: 0 3px;
+  border: 1px solid #DEDEDE;
+}
+
+#status .bar .value {
+  display: inline-block;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  transition: height .3s ease-out;
+  border-bottom: 1px solid;
+}
+
+#status .bar .value.open {
+  background-color: #F4BA6F;
+  border-color: #F4BA6F;
+}
+
+#status .bar .value.won {
+  background-color: #7FCB9F;
+  border-color: #7FCB9F;
+}
+
+#status .bar .value.lost {
+  background-color: #EA6D64;
+  border-color: #EA6D64;
 }
 
 .title {
   cursor: pointer;
-  color: #8E91E2;
+  color: #4A789C;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 400;
   padding-bottom: 3px;
   border-bottom: 1px solid transparent;
+  display: inline-block;
 }
 
 #metros.collapsed .title {
@@ -54,7 +124,7 @@ body {
 
 #metros.collapsed .title:hover {
   cursor: pointer;
-  color: #8E91E2;
+  color: #4A789C;
   border-bottom: 1px solid #666;
 }
 
@@ -64,15 +134,17 @@ body {
 }
 
 h1 {
-  color: #8E91E2;
-  font-size: 14px;
-  font-weight: 500;
+  color: #4A789C;
+  font-size: 20px;
+  font-weight: 400;
   -webkit-margin-before: 0;
-  border-bottom: 1px solid #ddd;
+  -webkit-margin-after: 0;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #ccc;
 }
 
 h2 {
-  color: #8E91E2;
+  color: #4A789C;
   font-size: 13px;
   font-weight: 400;
   border-bottom: 1px solid #eee;

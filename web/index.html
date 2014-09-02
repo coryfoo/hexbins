@@ -45,12 +45,12 @@
                 <div class="stat"><span>Trip Advisor</span>{{data.tripadvisor_count | number:0}}</div>
 
                 <h2>Revenue</h2>
-                <div class="stat" data-ng-repeat="rev in revenueKeys">
+                <div class="stat" data-ng-repeat="rev in revenueKeys" data-ng-show="data.revenue[rev]">
                     <span>{{rev}}</span>{{data.revenue[rev] | number:0}}
                 </div>
 
                 <h2>Headcount</h2>
-                <div class="stat" data-ng-repeat="hc in headcountKeys">
+                <div class="stat" data-ng-repeat="hc in headcountKeys" data-ng-show="data.headcount[hc]">
                     <span>{{hc}}</span>{{data.headcount[hc] | number:0}}
                 </div>
 

@@ -32,6 +32,11 @@ HexBinOverlay.prototype.setMode = function(mode) {
   handleHexbinData(this, this.data);
 };
 
+HexBinOverlay.prototype.setFilters = function(filters) {
+  this.filters = filters;
+  this.draw();
+};
+
 function clearBins(overlay) {
   overlay.svg && overlay.svg.remove();
 }
@@ -44,15 +49,14 @@ function loadDataForBounds(overlay) {
         .toString()
         .replace(/"/g, '')
         .replace(/\(/g, '[')
-        .replace(/\)/g, ']'))
+        .replace(/\)/g, ']')),
+    filters: overlay.filters || []
   };
 
   var args = [];
   for (var k in params) {
     args.push(k + '=' + JSON.stringify(params[k]));
   }
-
-  args.push('signals=[]');
 
   NProgress.start();
 
@@ -118,7 +122,7 @@ function handleHexbinData(overlay, data) {
         .range([0.1, 0.9]);
 
   } else {
-    hexClass = 'PuBuGn';
+    hexClass = 'PuBu';
     binDataFn = function(bin) {
       return overlay.useStatusData ? bin.count : bin;
     }

@@ -10,21 +10,22 @@ import places
 @route('/bins')
 def get_bins_for_google_maps():
     bounds = json.loads(request.params.get('bounds'))
-    signals = json.loads(request.params.get('signals'))
+    filters = json.loads(request.params.get('filters'))
     bin_size = 0.075 * math.pow(2, 9 - int(request.params.get('zoom')))
 
     response.content_type = 'application/json'
-    return json.dumps(places.get_binned_places(bounds, bin_size, signals=signals))
+    return json.dumps(places.get_binned_places(bounds, bin_size, filters=filters))
 
 
 @route('/account-bins')
 def get_bins_for_google_maps():
     bounds = json.loads(request.params.get('bounds'))
     account = request.params.get('account')
+    filters = json.loads(request.params.get('filters'))
     bin_size = 0.075 * math.pow(2, 9 - int(request.params.get('zoom')))
 
     response.content_type = 'application/json'
-    return json.dumps(places.get_binned_matches(bounds, account, bin_size))
+    return json.dumps(places.get_binned_matches(bounds, account, bin_size, filters=filters))
 
 
 @route('/verify')

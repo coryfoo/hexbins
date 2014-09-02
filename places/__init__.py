@@ -11,11 +11,11 @@ def verify_setup() -> bool:
         return False
 
 
-def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list:
+def get_binned_places(bounds: list, bin_size: float, filters: list=None) -> list:
     top_left_point = [bounds[0][1], bounds[1][0]]
     bottom_right_point = [bounds[1][1], bounds[0][0]]
 
-    query = json.dumps({
+    query = {
         "query": {
             "filtered": {
                 "query": {
@@ -24,11 +24,17 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list
                     }
                 },
                 "filter": {
-                    "geo_bounding_box": {
-                        "location": {
-                            "top_left": top_left_point,
-                            "bottom_right": bottom_right_point,
-                        }
+                    "bool": {
+                        "must": [
+                            {
+                                "geo_bounding_box": {
+                                    "location": {
+                                        "top_left": top_left_point,
+                                        "bottom_right": bottom_right_point,
+                                    }
+                                }
+                            }
+                        ]
                     }
                 }
             }
@@ -86,16 +92,26 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list
                 }
             }
         }
-    })
+    }
 
-    print(query)
+    must_tree = query.get('query').get('filtered').get('filter').get('bool').get('must')
+    for f in filters:
+        must_tree.append(
+            {
+                "missing": {
+                    "field": f,
+                    "existence": True,
+                    "null_value": True
+                }
+            })
+
     es = Elasticsearch()
 
     bins = {
         "binSize": bin_size,
         "bins": {}
     }
-    results = es.search(index='radius', body=query, doc_type='place')
+    results = es.search(index='radius', body=json.dumps(query), doc_type='place')
 
     for bucket in results['aggregations']['hexbins']['buckets']:
         bins['bins'][bucket['key']] = bucket['doc_count']
@@ -114,11 +130,11 @@ def get_binned_places(bounds: list, bin_size: float, signals: list=None) -> list
     return bins
 
 
-def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
+def get_binned_matches(bounds: list, account: int, bin_size: float, filters: list) -> list:
     top_left_point = [bounds[0][1], bounds[1][0]]
     bottom_right_point = [bounds[1][1], bounds[0][0]]
 
-    query = json.dumps({
+    query = {
         "size": 0,
         "aggs": {
             "hexbins": {
@@ -310,15 +326,23 @@ def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
             }
         }
     }
-    )
 
-    es = Elasticsearch()
+    must_tree = query.get('query').get('filtered').get('filter').get('bool').get('must')
+    for f in filters:
+        must_tree.append(
+            {
+                "missing": {
+                    "field": f,
+                    "existence": True,
+                    "null_value": True
+                }
+            })
 
     bins = {
         "binSize": bin_size,
         "bins": {}
     }
-    results = es.search(index='radius', body=query, doc_type='place')
+    results = (Elasticsearch()).search(index='radius', body=json.dumps(query), doc_type='place')
 
     for bucket in results['aggregations']['hexbins']['buckets']:
         bins['bins'][bucket['key']] = {
@@ -327,7 +351,6 @@ def get_binned_matches(bounds: list, account: int, bin_size: float) -> list:
             "lost": bucket['lost_count']['doc_count'],
             "open": bucket['open_count']['doc_count']
         }
-
 
     bins['stats'] = {
         "total": results['hits']['total']

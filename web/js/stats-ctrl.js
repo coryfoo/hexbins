@@ -8,6 +8,8 @@ function StatsCtrl($scope, $rootScope) {
   $scope.headcountKeys =
       ['1 to 4', '5 to 9', '10 to 19', '20 to 49', '50 to 99', '100 to 249', '250 to 499', '500 to 999', 'Over 1,000' ];
 
+  $scope.filters = {};
+
   $scope.$on('StatsReceived', function(evt, data) {
     $scope.$apply(function() {
       angular.extend($scope.data, data);
@@ -39,5 +41,15 @@ function StatsCtrl($scope, $rootScope) {
 
     $scope.data.mode = mode;
     window.hexbins.setMode(mode);
+  };
+
+  $scope.toggleFilter = function(filterName) {
+    if ( filterName in $scope.filters ) {
+      delete $scope.filters[filterName];
+    } else {
+      $scope.filters[filterName] = true;
+    }
+
+    window.hexbins.setFilters(Object.keys($scope.filters));
   };
 }

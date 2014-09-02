@@ -172,8 +172,17 @@ h2 {
 }
 
 .stat {
+  cursor: default;
   text-align: right;
   clear:both;
+}
+
+.stat.filterable {
+  cursor: pointer;
+}
+
+.stat.filtered span {
+  text-decoration: line-through;
 }
 
 .stat span {

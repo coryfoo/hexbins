@@ -22,7 +22,7 @@
             </div>
         </div>
         <div data-ng-controller="StatsCtrl" data-ng-show="data.total">
-            <div id="status">
+            <div id="status" data-ng-show="totalAccountStats">
                 <div class="col" data-ng-repeat="status in ['open', 'won', 'lost']">
                     <div class="bar">
                         <span class="value" data-ng-class="status"
@@ -37,12 +37,30 @@
                 <div class="stat"><span>Places</span>{{data.total | number:0}}</div>
 
                 <h2>Social Media</h2>
-                <div class="stat"><span>Twitter</span>{{data.twitter_count | number:0}}</div>
-                <div class="stat"><span>Facebook</span>{{data.facebook_count | number:0}}</div>
-                <div class="stat"><span>Google</span>{{data.google_count | number:0}}</div>
-                <div class="stat"><span>Yelp</span>{{data.yelp_count | number:0}}</div>
-                <div class="stat"><span>OpenTable</span>{{data.opentable_count | number:0}}</div>
-                <div class="stat"><span>Trip Advisor</span>{{data.tripadvisor_count | number:0}}</div>
+                <div class="stat filterable"
+                     data-ng-click="toggleFilter('twitter_account')"
+                     data-ng-class="{ 'filtered':filters['twitter_account'] }">
+                    <span>Twitter</span>{{data.twitter_count | number:0}}</div>
+                <div class="stat filterable"
+                     data-ng-click="toggleFilter('facebook')"
+                     data-ng-class="{ 'filtered':filters['facebook'] }">
+                    <span>Facebook</span>{{data.facebook_count | number:0}}</div>
+                <div class="stat filterable"
+                     data-ng-click="toggleFilter('google')"
+                     data-ng-class="{ 'filtered':filters['google'] }">
+                    <span>Google</span>{{data.google_count | number:0}}</div>
+                <div class="stat filterable"
+                     data-ng-click="toggleFilter('yelp')"
+                     data-ng-class="{ 'filtered':filters['yelp'] }">
+                    <span>Yelp</span>{{data.yelp_count | number:0}}</div>
+                <div class="stat filterable"
+                     data-ng-click="toggleFilter('opentable')"
+                     data-ng-class="{ 'filtered':filters['opentable'] }">
+                    <span>OpenTable</span>{{data.opentable_count | number:0}}</div>
+                <div class="stat filterable"
+                     data-ng-click="toggleFilter('tripadvisor')"
+                     data-ng-class="{ 'filtered':filters['tripadvisor'] }">
+                    <span>Trip Advisor</span>{{data.tripadvisor_count | number:0}}</div>
 
                 <h2>Revenue</h2>
                 <div class="stat" data-ng-repeat="rev in revenueKeys" data-ng-show="data.revenue[rev]">

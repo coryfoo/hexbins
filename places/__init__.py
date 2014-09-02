@@ -11,7 +11,7 @@ def verify_setup() -> bool:
         return False
 
 
-def get_binned_places(bounds: list, bin_size: float, filters: list=None) -> list:
+def get_binned_places(bounds: list, bin_size: float, filters: list=None, exclude_filters: dict=None) -> list:
     top_left_point = [bounds[0][1], bounds[1][0]]
     bottom_right_point = [bounds[1][1], bounds[0][0]]
 
@@ -94,16 +94,24 @@ def get_binned_places(bounds: list, bin_size: float, filters: list=None) -> list
         }
     }
 
-    must_tree = query.get('query').get('filtered').get('filter').get('bool').get('must')
-    for f in filters:
-        must_tree.append(
-            {
-                "missing": {
-                    "field": f,
-                    "existence": True,
-                    "null_value": True
-                }
-            })
+    if filters:
+        must_tree = query.get('query').get('filtered').get('filter').get('bool').get('must')
+        for f in filters:
+            must_tree.append(
+                {
+                    "missing": {
+                        "field": f,
+                        "existence": True,
+                        "null_value": True
+                    }
+                })
+
+    if exclude_filters:
+        must_not_tree = []
+        query.get('query').get('filtered').get('filter').get('bool')['must_not'] = must_not_tree
+
+        for key in exclude_filters.keys():
+            must_not_tree.append({"term": {exclude_filters[key]: key}})
 
     es = Elasticsearch()
 
@@ -130,7 +138,7 @@ def get_binned_places(bounds: list, bin_size: float, filters: list=None) -> list
     return bins
 
 
-def get_binned_matches(bounds: list, account: int, bin_size: float, filters: list) -> list:
+def get_binned_matches(bounds: list, account: int, bin_size: float, filters: list, exclude_filters: dict=None) -> list:
     top_left_point = [bounds[0][1], bounds[1][0]]
     bottom_right_point = [bounds[1][1], bounds[0][0]]
 
@@ -337,6 +345,14 @@ def get_binned_matches(bounds: list, account: int, bin_size: float, filters: lis
                     "null_value": True
                 }
             })
+
+    if exclude_filters:
+        must_not_tree = []
+        query.get('query').get('filtered').get('filter').get('bool')['must_not'] = must_not_tree
+
+        for key in exclude_filters.keys():
+            must_not_tree.append({"term": {exclude_filters[key]: key}})
+
 
     bins = {
         "binSize": bin_size,

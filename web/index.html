@@ -63,12 +63,16 @@
                     <span>Trip Advisor</span>{{data.tripadvisor_count | number:0}}</div>
 
                 <h2>Revenue</h2>
-                <div class="stat" data-ng-repeat="rev in revenueKeys" data-ng-show="data.revenue[rev]">
+                <div class="stat filterable" data-ng-repeat="rev in revenueKeys"
+                     data-ng-class="{ 'filtered':excludeFilters[rev] }"
+                     data-ng-click="toggleExcludeFilter(rev, 'revenue')">
                     <span>{{rev}}</span>{{data.revenue[rev] | number:0}}
                 </div>
 
                 <h2>Headcount</h2>
-                <div class="stat" data-ng-repeat="hc in headcountKeys" data-ng-show="data.headcount[hc]">
+                <div class="stat filterable" data-ng-repeat="hc in headcountKeys"
+                     data-ng-class="{ 'filtered':excludeFilters[hc] }"
+                     data-ng-click="toggleExcludeFilter(hc, 'headcount')">
                     <span>{{hc}}</span>{{data.headcount[hc] | number:0}}
                 </div>
 

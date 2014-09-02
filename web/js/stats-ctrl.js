@@ -9,19 +9,29 @@ function StatsCtrl($scope, $rootScope) {
       ['1 to 4', '5 to 9', '10 to 19', '20 to 49', '50 to 99', '100 to 249', '250 to 499', '500 to 999', 'Over 1,000' ];
 
   $scope.filters = {};
+  $scope.excludeFilters = {};
 
   $scope.$on('StatsReceived', function(evt, data) {
     $scope.$apply(function() {
       angular.extend($scope.data, data);
 
       var revenue = {};
+      $scope.revenueKeys.forEach(function(k) {
+        revenue[k] = 0;
+      });
+
       $scope.data.revenue.forEach(function(rev) {
         revenue[rev.key] = rev.doc_count;
       });
 
       $scope.data.revenue = revenue;
 
+
       var headcount = {};
+      $scope.headcountKeys.forEach(function(k) {
+        headcount[k] = 0;
+      });
+
       $scope.data.headcount.forEach(function(hc) {
         headcount[hc.key] = hc.doc_count;
       });
@@ -30,7 +40,7 @@ function StatsCtrl($scope, $rootScope) {
     });
   });
 
-  $scope.$on('AccountStatsRecevied', function(evt, data) {
+  $scope.$on('AccountStatsReceived', function(evt, data) {
     $scope.$apply(function() {
       $rootScope.totalAccountStats = data;
     });
@@ -51,5 +61,15 @@ function StatsCtrl($scope, $rootScope) {
     }
 
     window.hexbins.setFilters(Object.keys($scope.filters));
+  };
+
+  $scope.toggleExcludeFilter = function(filterName, key) {
+    if ( filterName in $scope.excludeFilters ) {
+      delete $scope.excludeFilters[filterName];
+    } else {
+      $scope.excludeFilters[filterName] = key;
+    }
+
+    window.hexbins.setExcludeFilters($scope.excludeFilters);
   };
 }

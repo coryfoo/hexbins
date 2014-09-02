@@ -37,6 +37,11 @@ HexBinOverlay.prototype.setFilters = function(filters) {
   this.draw();
 };
 
+HexBinOverlay.prototype.setExcludeFilters = function(filters) {
+  this.excludeFilters = filters;
+  this.draw();
+};
+
 function clearBins(overlay) {
   overlay.svg && overlay.svg.remove();
 }
@@ -50,7 +55,8 @@ function loadDataForBounds(overlay) {
         .replace(/"/g, '')
         .replace(/\(/g, '[')
         .replace(/\)/g, ']')),
-    filters: overlay.filters || []
+    filters: overlay.filters || [],
+    exclude: overlay.excludeFilters || {}
   };
 
   var args = [];

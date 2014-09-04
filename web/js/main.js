@@ -49,7 +49,7 @@ function loadStatusCountsForAccount(accountId) {
   text.innerText = 'Loading status counts';
 
   d3.json('/status-counts?account='+accountId, function(err, data) {
-    angular.element(document.getElementsByTagName('body')[0]).scope().$broadcast('AccountStatsRecevied', {
+    angular.element(document.getElementsByTagName('body')[0]).scope().$broadcast('AccountStatsReceived', {
       'open': data['total_open_count'],
       'won': data['total_won_count'],
       'lost': data['total_lost_count'],
